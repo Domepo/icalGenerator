@@ -1,5 +1,8 @@
+import json
 from icalendar import Calendar, Event, Alarm
 from datetime import date, datetime, timedelta
+
+from icalendar.caselessdict import CaselessDict
 
 
 class icalGen:
@@ -54,14 +57,24 @@ class icalGen:
 
     def writeIcal(self):
         self.dayConverter()
-        dstartArrLen = len(self.dstartArr)
 
-        dt = datetime(2021, 12, 18)
-        calanderWeek = dt.strftime("%U")
-        print(int(calanderWeek) / self.numberOfNames)
+        calanderWeekArr = []
+        weeksDividedByDays= {}
+        weekCounter = 0
         for i in self.dstartArr:
-            print((datetime.strptime(i,"%Y-%m-%d" + "-T" + "%H%M%S")).strftime("%V")+" "+ i)
+            # CHANGE strptime
+            calanderWeekArr.append(int((datetime.strptime(i,"%Y-%m-%d" + "-T" + "%H%M%S")).strftime("%V")))
+        
+        # Devide Days Into Weeks
+        for i in range(0,len(calanderWeekArr)):
+            if(calanderWeekArr[i] != calanderWeekArr[i-1]):
+                weekCounter = i
+                weeksDividedByDays[weekCounter] = []
+            
+            weeksDividedByDays[weekCounter].append(self.dstartArr[i])
+  
+        print(weeksDividedByDays.keys())
 
-Bild = icalGen("Bild", ["MI", "FR"], ["Dominik", "Peter","Andreas"])
 
+Bild = icalGen("Bild", ["MI", "Do"], ["Dominik", "Peter","Andreas"])
 Bild.writeIcal()
