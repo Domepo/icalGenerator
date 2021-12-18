@@ -55,7 +55,7 @@ class icalGen:
             start_date += delta
                 
 
-    def writeIcal(self):
+    def weekDivider(self):
         self.dayConverter()
 
         calanderWeekArr = []
@@ -65,15 +65,39 @@ class icalGen:
             # CHANGE strptime
             calanderWeekArr.append(int((datetime.strptime(i,"%Y-%m-%d" + "-T" + "%H%M%S")).strftime("%V")))
         
-        # Devide Days Into Weeks
+        # Divide Days Into Weeks
+        weekCounter = 1
         for i in range(0,len(calanderWeekArr)):
             if(calanderWeekArr[i] != calanderWeekArr[i-1]):
-                weekCounter = i
                 weeksDividedByDays[weekCounter] = []
-            
-            weeksDividedByDays[weekCounter].append(self.dstartArr[i])
-  
-        print(weeksDividedByDays.keys())
+                weekCounter += 1
+            weeksDividedByDays[weekCounter-1].append(self.dstartArr[i])
+        return weeksDividedByDays
+
+    def formatIcal(self):
+        # Assign names to weeks/appointment
+        weeksDividedByNames = {}
+        weeksDividedByNamesFormat = {}
+        weeksDividedByDays = self.weekDivider()
+        for k,p in enumerate(self.name):
+            weeksDividedByNames[p]=[]
+            for i in weeksDividedByDays: 
+                if (i % self.numberOfNames == k):
+                    weeksDividedByNames[p].append(weeksDividedByDays[i])
+
+            weeksDividedByNamesFormat[p] = []
+            for i in weeksDividedByNames.get(p):
+                for l in i:
+                    weeksDividedByNamesFormat[p].append(l)
+
+        return weeksDividedByNamesFormat
+   
+    def writeIcal(self):
+        formatIcal = self.formatIcal()
+
+        print(formatIcal["Andreas"])
+
+
 
 
 Bild = icalGen("Bild", ["MI", "Do"], ["Dominik", "Peter","Andreas"])
